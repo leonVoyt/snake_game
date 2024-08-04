@@ -214,17 +214,20 @@ export default class Snakegame {
 
         switch (selectedOptionText) {
           case "Classic":
-            this.ts.setDuration(false);
+            this.ts.isFast = false;
+            this.ts.isWalls = false;
             return (this.ts.isDontDie = false);
           case "Speed":
             this.ts.isDontDie = false;
-            return this.ts.setDuration(true);
+            this.ts.isWalls = false;
+            return (this.ts.isFast = true);
 
           case "No Die":
-            this.ts.setDuration(false);
+            this.ts.isFast = false;
+            this.ts.isWalls = false;
             return (this.ts.isDontDie = true);
           case "Walls":
-            this.ts.setDuration(false);
+            this.ts.isFast = false;
             this.ts.isDontDie = false;
             return (this.ts.isWalls = true);
 
@@ -296,6 +299,7 @@ export default class Snakegame {
 
     // Update random part and hit test detection
     let hitPart: any = null;
+
     this.rlist.forEach((it) => {
       if (head.i == it.i && head.j == it.j) {
         hitPart = it;
@@ -315,6 +319,7 @@ export default class Snakegame {
       this.pixiApp.stage.removeChild(hitPart);
 
       let i;
+
       for (i = this.rlist.length - 1; i >= 0; i--) {
         if (this.rlist[i] == hitPart) break;
       }
@@ -341,9 +346,10 @@ export default class Snakegame {
     const rj = Math.floor(Math.random() * 20);
     const ri = Math.floor(Math.random() * 20);
 
-    const part = new SnakePart(this.ts);
-    part.tint = Math.random() * 0xffffff;
-    part.rotation = Math.random() * 2 * Math.PI;
+    const part = new SnakePart(this.ts, Texture.from("assets/mouse.png"));
+    part.width = 32;
+    part.height = 32;
+    part.tint = 0xffffff;
     part.setPosition(ri, rj);
     this.pixiApp.stage.addChild(part);
     this.rlist.push(part);

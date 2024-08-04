@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2D Snake Game</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container__main">
+      <div class="content__container">
+        <div id="app" class="game-field"></div>
+        <div class="menu__container">
+          <h2 class="title">Snake Game</h2>
+          <div class="score-section">
+            <div class="score-item">
+              <span id="">Best :</span>
+              <span id="best-current"></span>
+            </div>
+            <div class="score-item">
+              <span id="">Score : </span>
+              <span id="score-current"></span>
+            </div>
+          </div>
+          <div class="options">
+            <label
+              ><input type="checkbox" class="game-option" checked />
+              Classic</label
+            >
+            <label><input type="checkbox" class="game-option" /> No Die</label>
+            <label><input type="checkbox" class="game-option" /> Speed</label>
+          </div>
+          <div class="buttons">
+            <button class="buttons__menu" id="play-button">Play</button>
+            <button class="buttons__menu" id="exit-button">Exit</button>
+            <button class="buttons__game" id="menu-button">Menu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

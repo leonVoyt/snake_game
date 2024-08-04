@@ -198,44 +198,40 @@ export default class Snakegame {
       document.querySelectorAll<HTMLInputElement>(".game-option");
     let selectOption: string = "";
 
-    checkboxes.forEach(() => {
-      // Get the selected checkbox
-      if (selectOption) return;
+    const selectedCheckbox = Array.from(checkboxes).find(
+      (checkbox) => checkbox.checked
+    );
 
-      const selectedCheckbox = Array.from(checkboxes).find(
-        (checkbox) => checkbox.checked
-      );
+    if (selectedCheckbox) {
+      const selectedOptionText =
+        selectedCheckbox.parentElement?.textContent?.trim() ?? "Unknown option";
 
-      if (selectedCheckbox) {
-        const selectedOptionText =
-          selectedCheckbox.parentElement?.textContent?.trim() ??
-          "Unknown option";
-        selectOption = selectedOptionText;
-
-        switch (selectedOptionText) {
-          case "Classic":
-            this.ts.isFast = false;
-            this.ts.isWalls = false;
-            return (this.ts.isDontDie = false);
-          case "Speed":
-            this.ts.isDontDie = false;
-            this.ts.isWalls = false;
-            return (this.ts.isFast = true);
-
-          case "No Die":
-            this.ts.isFast = false;
-            this.ts.isWalls = false;
-            return (this.ts.isDontDie = true);
-          case "Walls":
-            this.ts.isFast = false;
-            this.ts.isDontDie = false;
-            return (this.ts.isWalls = true);
-
-          default:
-            return;
-        }
+      switch (selectedOptionText) {
+        case "Classic":
+          this.ts.isFast = false;
+          this.ts.isWalls = false;
+          this.ts.isDontDie = false;
+          break;
+        case "Speed":
+          this.ts.isFast = true;
+          this.ts.isWalls = false;
+          this.ts.isDontDie = false;
+          break;
+        case "No Die":
+          this.ts.isFast = false;
+          this.ts.isWalls = false;
+          this.ts.isDontDie = true;
+          break;
+        case "Walls":
+          this.ts.isFast = false;
+          this.ts.isDontDie = false;
+          this.ts.isWalls = true;
+          break;
+        default:
+          return null;
       }
-    });
+    }
+    return;
   }
   /**
    * Start a new game

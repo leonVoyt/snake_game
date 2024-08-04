@@ -1,7 +1,3 @@
-/**
- * @author  raizensoft.com
- */
-
 import { Howl } from "howler";
 import { Application, TilingSprite, Texture } from "pixi.js";
 import SnakePart from "./SnakePart";
@@ -227,6 +223,10 @@ export default class Snakegame {
           case "No Die":
             this.ts.setDuration(false);
             return (this.ts.isDontDie = true);
+          case "Walls":
+            this.ts.setDuration(false);
+            this.ts.isDontDie = false;
+            return (this.ts.isWalls = true);
 
           default:
             return;
@@ -322,6 +322,11 @@ export default class Snakegame {
 
       // Add new random segment
       this.placeRandomPart();
+
+      // Добавить стену после поедания еды
+      if (this.ts.isWalls) {
+        this.ts.onEatFood();
+      }
     }
 
     if (this.ts.selfHitTest()) {

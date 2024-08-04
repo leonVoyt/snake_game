@@ -1,8 +1,4 @@
-/**
- * @author  raizensoft.com
- */
-
-import { Sprite } from "pixi.js";
+import { Sprite, Texture } from "pixi.js";
 import TheSnake from "./TheSnake";
 
 const BLOCKSIZE = 32;
@@ -19,8 +15,8 @@ export default class SnakePart extends Sprite {
   ts: TheSnake;
   next: SnakePart;
 
-  constructor(ts: TheSnake) {
-    super(ts.ptex);
+  constructor(ts: TheSnake, texture: Texture = ts.ptex) {
+    super(texture);
     this.ts = ts;
     this.init();
   }
@@ -45,7 +41,6 @@ export default class SnakePart extends Sprite {
   }
 
   update(etime: number) {
-    if (this.ts.isGamePaused) return;
     let dx = this.next.ox - this.ox;
     let dy = this.next.oy - this.oy;
 
@@ -72,7 +67,6 @@ export default class SnakePart extends Sprite {
   }
 
   applyNext() {
-    if (this.ts.isGamePaused) return;
     if (this.next) {
       const newI = this.next.i;
       const newJ = this.next.j;

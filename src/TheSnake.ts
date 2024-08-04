@@ -1,7 +1,3 @@
-/**
- * @author  raizensoft.com
- */
-
 import { Container, Texture } from "pixi.js";
 import SnakePart from "./SnakePart";
 
@@ -22,62 +18,74 @@ export default class TheSnake extends Container {
   currentDir: number;
   isDontDie: boolean;
   isFast: boolean;
+  isWalls: boolean;
   isGamePaused: boolean;
+  walls: SnakePart[];
 
   dirmap: number[][] = [
-    [-1, 0],
-    [0, 1],
-    [1, 0],
-    [0, -1],
+    [-1, 0], // Up
+    [0, 1], // Right
+    [1, 0], // Down
+    [0, -1], // Left
   ];
 
   constructor() {
     super();
     this.stepDuration = STEP_DURATION;
+    this.walls = [];
     this.init();
   }
 
-  /**
-   * Init class components
-   * @method init
-   */
   init() {
     this.ptex = Texture.from("assets/Part.png");
     this.plist = [];
     this.cursorHead = new SnakePart(this);
   }
-  setDuration(val: boolean) {
-    this.isFast = val;
-    this.stepDuration = this.isFast ? STEP_DURATION / 1.5 : STEP_DURATION;
+
+  addHead() {
+    const lastPart = this.plist[this.plist.length - 1];
+    const newHead = new SnakePart(this);
+
+    // Place new head where the current tail is
+    newHead.setPosition(lastPart.i, lastPart.j);
+    this.addChildAt(newHead, 0);
+
+    // Update the linked list
+    lastPart.next = newHead;
+    newHead.next = this.cursorHead;
+
+    // Update the parts list
+    this.plist.push(newHead);
+
+    // Shift the cursor head
+    this.shiftCursorHead();
+
+    // Adjust step duration if the snake is moving fast
+    if (this.isFast) {
+      this.stepDuration = this.stepDuration - this.stepDuration / 10;
+    }
   }
 
-  addHead(i: number, j: number) {
-    this.plist[0].reset();
-    const newHead = new SnakePart(this);
-    newHead.setPosition(
-      i + this.dirmap[this.currentDir][0],
-      j + this.dirmap[this.currentDir][1]
-    );
-    this.addChildAt(newHead, this.plist.length);
+  addTail() {
+    const lastPart = this.plist[this.plist.length - 1];
+    const newPart = new SnakePart(this, this.ptex);
 
-    // Assign next pointer
-    this.plist[0].next = newHead;
-    newHead.next = this.cursorHead;
-    this.plist.unshift(newHead);
-    this.shiftCursorHead();
-    this.stepDuration -= 0.001;
+    newPart.setPosition(lastPart.i, lastPart.j);
+    lastPart.next = newPart;
+    this.plist.push(newPart);
+    this.addChild(newPart);
   }
 
   update(delta: number) {
+    if (this.isGamePaused) return;
+
     const dtime = delta / 60;
     this.etime += dtime;
 
-    // Running animation
     this.plist.forEach((it) => {
       it.update(this.etime);
     });
 
-    // Move to next step
     if (this.stepDuration - this.etime < 0.01) {
       this.etime = 0;
       for (let i = this.plist.length - 1; i > 0; i--) {
@@ -93,7 +101,6 @@ export default class TheSnake extends Container {
     if (this.isGamePaused) return;
 
     if (this.isDontDie) {
-      // don`t die
       const ci = this.cursorHead.i;
       const cj = this.cursorHead.j;
 
@@ -123,12 +130,14 @@ export default class TheSnake extends Container {
       const s = this.plist[i] as SnakePart;
       if (hi == s.i && hj == s.j) return true;
     }
+
+    for (const wall of this.walls) {
+      if (hi == wall.i && hj == wall.j) return true;
+    }
+
     return false;
   }
 
-  /**
-   * Reset snake state
-   */
   reset() {
     this.etime = 0;
     this.plist.forEach((it) => {
@@ -136,11 +145,13 @@ export default class TheSnake extends Container {
     });
     this.plist.splice(0);
 
-    // Reset blist
     this.currentDir = 1;
 
     for (let i = 0; i < DEFAULT_TOTAL; i++) {
-      const part = new SnakePart(this);
+      const part = new SnakePart(
+        this,
+        i === 0 ? Texture.from("assets/snakeHead.png") : this.ptex
+      );
       part.setPosition(0, DEFAULT_TOTAL - i - 1);
       this.plist.push(part);
       this.addChild(part);
@@ -151,5 +162,35 @@ export default class TheSnake extends Container {
     }
     this.plist[0].next = this.cursorHead;
     this.cursorHead.setPosition(0, DEFAULT_TOTAL);
+
+    this.walls.forEach((wall) => {
+      this.removeChild(wall);
+    });
+    this.walls = [];
+  }
+
+  placeRandomWall() {
+    const rj = Math.floor(Math.random() * 20);
+    const ri = Math.floor(Math.random() * 20);
+
+    const wallTexture = Texture.from("assets/stop.png");
+    const wall = new SnakePart(this, wallTexture);
+
+    wall.width = 32;
+    wall.height = 32;
+
+    wall.setPosition(ri, rj);
+    this.addChild(wall);
+    this.walls.push(wall);
+  }
+
+  onEatFood() {
+    this.addTail();
+    this.placeRandomWall();
+  }
+
+  reverseDirection() {
+    // Reverse the direction by mapping the current direction to its opposite
+    this.currentDir = (this.currentDir + 2) % 4;
   }
 }
